@@ -9,7 +9,7 @@
 1. Clona il progetto:
 
 ```bash
-git clone https://github.com/tuo-utente/MyFoodAI.git
+git clone https://github.com/fazelucq1/MyFoodAI.git
 cd MyFoodAI
 ```
 
