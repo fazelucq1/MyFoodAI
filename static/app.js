@@ -69,23 +69,39 @@ autoEl.addEventListener('click', e => {
   }
 });
 
+function showAlert(msg) {
+  const alert = document.createElement('div');
+  alert.textContent = msg;
+  alert.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded shadow z-50';
+  document.body.appendChild(alert);
+  setTimeout(() => alert.remove(), 5000);
+}
+
 addBtn.onclick = () => {
   const ing = inputEl.value.trim();
   const validList = categoryEl.value ? categories[categoryEl.value] : allIngredients;
   if (ing && validList.includes(ing) && !selected.includes(ing)) {
     selected.push(ing);
     document.cookie = `ingredients=${encodeURIComponent(JSON.stringify(selected))}; path=/`;
+
     const li = document.createElement('li');
+    li.className = 'inline-block bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full mr-2 mb-2';
     li.textContent = ing;
     selEl.appendChild(li);
-    genBtn.disabled = selected.length < 3 || selected.length > 80;
   }
   inputEl.value = '';
 };
 
 viewBtn.onclick = () => window.location.href = '/dump';
 
+genBtn.disabled = false;
+
 genBtn.onclick = async () => {
+  if (selected.length < 3) {
+    showAlert('Aggiungi almeno 3 ingredienti per generare una ricetta.');
+    return;
+  }
+
   resEl.textContent = 'Caricamento...';
   resEl.classList.remove('hidden');
   try {
@@ -96,7 +112,7 @@ genBtn.onclick = async () => {
     });
     const j = await r.json();
 
-    resEl.innerHTML = ''; 
+    resEl.innerHTML = '';
 
     if (j.error) {
       const errP = document.createElement('p');
