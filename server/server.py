@@ -4,7 +4,8 @@ import json
 import os
 
 app = Flask(__name__, static_folder='../static', template_folder='../public')
-API_KEY = 
+
+API_KEY = os.environ.get('GEMINI_API_KEY')
 
 @app.route('/')
 def index():
