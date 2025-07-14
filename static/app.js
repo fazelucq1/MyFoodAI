@@ -39,53 +39,52 @@ const viewBtn = document.getElementById('view-btn');
 const genBtn = document.getElementById('generate-btn');
 const selEl = document.getElementById('selected-ingredients');
 const resEl = document.getElementById('recipe-result');
-
+const allIngredients = Object.values(categories).flat();
 Object.keys(categories).forEach(cat => {
-  const o = document.createElement('option');
-  o.value = cat;
-  o.text = cat;
-  categoryEl.append(o);
+  const o = document.createElement('option'); o.value = cat; o.text = cat; categoryEl.append(o);
 });
-
 inputEl.addEventListener('input', () => {
-  const list = categories[categoryEl.value] || [];
+  const list = categoryEl.value ? categories[categoryEl.value] : allIngredients;
   const query = inputEl.value.toLowerCase();
-  if (!query) return autoEl.classList.add('hidden');
+  if (!query) { autoEl.classList.add('hidden'); return; }
   const matches = list.filter(i => i.toLowerCase().includes(query)).slice(0, 10);
   autoEl.innerHTML = matches.map(i => `<li class="px-2 py-1 hover:bg-gray-200 cursor-pointer">${i}</li>`).join('');
   autoEl.classList.toggle('hidden', matches.length === 0);
 });
-
 autoEl.addEventListener('click', e => {
   if (e.target.tagName === 'LI') {
     inputEl.value = e.target.textContent;
     autoEl.classList.add('hidden');
   }
 });
-
 addBtn.onclick = () => {
   const ing = inputEl.value.trim();
-  if (ing && categories[categoryEl.value]?.includes(ing) && !selected.includes(ing)) {
+  const validList = categoryEl.value ? categories[categoryEl.value] : allIngredients;
+  if (ing && validList.includes(ing) && !selected.includes(ing)) {
     selected.push(ing);
     document.cookie = `ingredients=${encodeURIComponent(JSON.stringify(selected))}; path=/`;
-    const li = document.createElement('li');
-    li.textContent = ing;
-    selEl.append(li);
+    const li = document.createElement('li'); li.textContent = ing; selEl.append(li);
     genBtn.disabled = selected.length < 3 || selected.length > 80;
   }
   inputEl.value = '';
 };
-
 viewBtn.onclick = () => window.location.href = '/dump';
-
 genBtn.onclick = async () => {
-  resEl.innerHTML = 'Caricamento...';
-  resEl.classList.remove('hidden');
+  resEl.innerHTML = 'Caricamento...'; resEl.classList.remove('hidden');
   const r = await fetch('/generate', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({ingredients: selected})
   });
   const j = await r.json();
-  resEl.innerHTML = ``;
+  if (j.error) resEl.innerHTML = `<p class="text-red-500">Errore: ${j.error}</p>`;
+  else resEl.innerHTML = `
+    <div class='border-l-4 border-blue-500 pl-4 mb-4'>
+      <h2 class='text-xl font-bold'>${j.nome}</h2>
+      <p>⏱️ ${j.tempo} | 🧑🍳 ${j.difficolta}</p>
+    </div>
+    <ul class='list-disc pl-5 mb-4'>${j.ingredienti.map(i => `<li>${i}</li>`).join('')}</ul>
+    <ol class='list-decimal pl-5 mb-4'>${j.procedimento.map(p => `<li>${p}</li>`).join('')}</ol>
+    ${j.tips ? `<p class='p-3 bg-yellow-50 rounded-lg'>💡 ${j.tips}</p>` : ''}
+  `;
 };
