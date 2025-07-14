@@ -35,7 +35,7 @@ GEMINI_API_KEY=la_tua_chiave_api
 5. Avvia il server:
 
 ```bash
-python app.py
+python server/server.py
 ```
 
 ---
