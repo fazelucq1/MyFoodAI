@@ -13,15 +13,22 @@ def static_files(filename):
     return send_from_directory(app.static_folder, filename)
 @app.route('/generate', methods=['POST'])
 def gen():
-    data = request.json['ingredients']
+    data = request.json.get('ingredients', [])
     prompt = f"Genera ricetta in JSON usando SOLO questi ingredienti: {','.join(data)}. Massimo 5 passaggi, solo sale/pepe/olio extra."
     r = requests.post(
         'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
         json={"contents":[{"parts":[{"text":prompt}]}]},
         headers={'X-goog-api-key': API_KEY, 'Content-Type':'application/json'}
     )
-    txt = r.json()['candidates'][0]['output']
-    j = txt[txt.find('{'):txt.rfind('}')+1]
-    return jsonify(eval(j))
+    resp = r.json()
+    if 'candidates' not in resp:
+        return jsonify({'error': 'API response error', 'detail': resp}), 500
+    txt = resp['candidates'][0]['output']
+    j_str = txt[txt.find('{'):txt.rfind('}')+1]
+    try:
+        j = eval(j_str)
+    except Exception:
+        return jsonify({'error': 'Parsing error'}), 500
+    return jsonify(j)
 if __name__ == '__main__':
     app.run(port=5000)
