@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingredienti Selezionati - MyFoodAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-6">
+    <h1 class="text-2xl font-bold text-center mb-4">Ingredienti Selezionati</h1>
+    <ul id="ingredients-list" class="list-disc pl-5 space-y-1"></ul>
+    <div class="mt-6 text-center">
+      <a href="/" class="text-blue-500 hover:underline">Torna indietro</a>
+    </div>
+  </div>
+  <script>
+    const cookies = document.cookie.split('; ').reduce((obj, c) => {
+      const [key, v] = c.split('='); obj[key] = v; return obj;
+    }, {});
+    const list = document.getElementById('ingredients-list');
+    if(cookies.ingredients){
+      try{
+        const arr = JSON.parse(decodeURIComponent(cookies.ingredients));
+        arr.forEach(i => {
+          const li = document.createElement('li'); li.textContent = i; list.append(li);
+        });
+      } catch(e){ list.innerHTML = '<li>Errore nel caricamento.</li>'; }
+    } else list.innerHTML = '<li>Nessun ingrediente selezionato.</li>';
+  </script>
+</body>
+</html>
