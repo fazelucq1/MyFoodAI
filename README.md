@@ -26,10 +26,10 @@ source venv/bin/activate  # Su Windows: venv\Scripts\activate
 pip install -r server/requirements.txt
 ```
 
-4. Crea un file `.env` nella root del progetto:
+4. Imposta la `KEY` come variabile d'ambiente 
 
 ```
-GEMINI_API_KEY=la_tua_chiave_api
+export GEMINI_API_KEY="la_tua_chiave_api"
 ```
 
 5. Avvia il server:
