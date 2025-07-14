@@ -23,7 +23,7 @@ source venv/bin/activate  # Su Windows: venv\Scripts\activate
 3. Installa le dipendenze:
 
 ```bash
-pip install -r requirements.txt
+pip install -r server/requirements.txt
 ```
 
 4. Crea un file `.env` nella root del progetto:
