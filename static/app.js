@@ -40,12 +40,13 @@ const genBtn = document.getElementById('generate-btn');
 const selEl = document.getElementById('selected-ingredients');
 const resEl = document.getElementById('recipe-result');
 
-// Popola select categorie
-tObject.keys(categories).forEach(cat => {
-  const o = document.createElement('option'); o.value = cat; o.text = cat; categoryEl.append(o);
+Object.keys(categories).forEach(cat => {
+  const o = document.createElement('option');
+  o.value = cat;
+  o.text = cat;
+  categoryEl.append(o);
 });
 
-// Gestione autocomplete dinamico
 inputEl.addEventListener('input', () => {
   const list = categories[categoryEl.value] || [];
   const query = inputEl.value.toLowerCase();
@@ -67,17 +68,24 @@ addBtn.onclick = () => {
   if (ing && categories[categoryEl.value]?.includes(ing) && !selected.includes(ing)) {
     selected.push(ing);
     document.cookie = `ingredients=${encodeURIComponent(JSON.stringify(selected))}; path=/`;
-    const li = document.createElement('li'); li.textContent = ing; selEl.append(li);
+    const li = document.createElement('li');
+    li.textContent = ing;
+    selEl.append(li);
     genBtn.disabled = selected.length < 3 || selected.length > 80;
   }
   inputEl.value = '';
 };
 
-viewBtn.onclick = () => window.location.href = '/public/ingredients.html';
+viewBtn.onclick = () => window.location.href = '/dump';
 
 genBtn.onclick = async () => {
-  resEl.innerHTML = 'Caricamento...'; resEl.classList.remove('hidden');
-  const r = await fetch('/generate', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ingredients:selected})});
+  resEl.innerHTML = 'Caricamento...';
+  resEl.classList.remove('hidden');
+  const r = await fetch('/generate', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ingredients: selected})
+  });
   const j = await r.json();
-  resEl.innerHTML = `...`;
+  resEl.innerHTML = ``;
 };
